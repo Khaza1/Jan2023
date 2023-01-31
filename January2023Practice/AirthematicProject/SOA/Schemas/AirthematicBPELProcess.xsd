@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+        targetNamespace="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess"
+        xmlns="http://www.w3.org/2001/XMLSchema">
+  <element name="AirthematicBPELRequest">
+    <complexType>
+      <sequence>
+        <element name="InputOne" type="integer"/>
+        <element name="InputTwo" type="integer"/>
+      </sequence>
+    </complexType>
+  </element>
+  <element name="AirthematicBPELResponse">
+    <complexType>
+      <sequence>
+        <element name="Operation" type="string"/>
+        <element name="Result" type="integer"/>
+      </sequence>
+    </complexType>
+  </element>
+</schema>

@@ -1,0 +1,30 @@
+<?xml version= '1.0' encoding= 'UTF-8' ?>
+<wsdl:definitions
+     name="HelloIndia"
+     targetNamespace="http://xmlns.oracle.com/January2023Practice/HelloIndia/HelloIndia"
+     xmlns:tns="http://xmlns.oracle.com/January2023Practice/HelloIndia/HelloIndia"
+     xmlns:inp1="http://www.practice.com/june/practice/HelloIndia"
+     xmlns:inp2="http://www.practice.com/june/practice/Hello"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    >
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:import namespace="http://www.practice.com/june/practice/HelloIndia" schemaLocation="../Schemas/HelloIndiaRequestschema.xsd"/>
+        </xsd:schema>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:import namespace="http://www.practice.com/june/practice/Hello" schemaLocation="../Schemas/HelloIndiaResponseSchema.xsd"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="requestMessage">
+        <wsdl:part name="ABC" element="inp1:HelloIndiaRequest"/>
+    </wsdl:message>
+    <wsdl:message name="replyMessage">
+        <wsdl:part name="XYZ" element="inp2:HelloIndiaResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="HelloPort">
+        <wsdl:operation name="execute">
+            <wsdl:input message="tns:requestMessage"/>
+            <wsdl:output message="tns:replyMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>

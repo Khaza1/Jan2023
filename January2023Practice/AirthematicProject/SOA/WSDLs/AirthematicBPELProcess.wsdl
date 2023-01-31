@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="AirthematicBPELProcess"
+             targetNamespace="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess"
+             xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:client="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess"
+             xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	TYPE DEFINITION - List of services participating in this BPEL process
+	The default output of the BPEL designer uses strings as input and 
+	output to the BPEL Process. But you can define or import any XML 
+	Schema type and use them as part of the message types.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->   
+	<wsdl:types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess" schemaLocation="../Schemas/AirthematicBPELProcess.xsd" />
+		</schema>
+	</wsdl:types>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	MESSAGE TYPE DEFINITION - Definition of the message types used as 
+	part of the port type defintions
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->      
+	<wsdl:message name="AirthematicBPELProcessRequestMessage">
+		<wsdl:part name="payload" element="client:AirthematicBPELRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="AirthematicBPELProcessResponseMessage">
+		<wsdl:part name="payload" element="client:AirthematicBPELResponse"/>
+	</wsdl:message>
+
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PORT TYPE DEFINITION - A port type groups a set of operations into
+	a logical service unit.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- portType implemented by the AirthematicBPELProcess BPEL process -->
+	<wsdl:portType name="AirthematicBPELProcess">
+		<wsdl:operation name="Additionprocess">
+			<wsdl:input message="client:AirthematicBPELProcessRequestMessage"/>
+		</wsdl:operation>
+                
+                <wsdl:operation name="Subtractionprocess">
+			<wsdl:input message="client:AirthematicBPELProcessRequestMessage"/>
+                        <wsdl:output message="client:AirthematicBPELProcessResponseMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!-- portType implemented by the requester of AirthematicBPELProcess BPEL process
+	for asynchronous callback purposes
+	-->
+	<wsdl:portType name="AirthematicBPELProcessCallback">
+		<wsdl:operation name="AdditionprocessResponse">
+			<wsdl:input message="client:AirthematicBPELProcessResponseMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	PARTNER LINK TYPE DEFINITION
+	the AirthematicBPELProcess partnerLinkType binds the provider and
+	requester portType into an asynchronous conversation.
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<plnk:partnerLinkType name="AirthematicBPELProcess">
+		<plnk:role name="AirthematicBPELProcessProvider" portType="client:AirthematicBPELProcess"/>
+		<plnk:role name="AirthematicBPELProcessRequester" portType="client:AirthematicBPELProcessCallback"/>
+	</plnk:partnerLinkType>
+</wsdl:definitions>

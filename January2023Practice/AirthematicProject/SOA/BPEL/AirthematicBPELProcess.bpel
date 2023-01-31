@@ -1,0 +1,109 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Tue Jan 31 21:09:39 IST 2023
+  Author:  khaza
+  Type: BPEL 2.0 Process
+  Purpose: Asynchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="AirthematicBPELProcess"
+         targetNamespace="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:client="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess"
+         xmlns:ora="http://schemas.oracle.com/xpath/extension"
+         xmlns:ui="http://xmlns.oracle.com/soa/designer"
+         xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+
+    <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/January2023Practice/AirthematicProject/AirthematicBPELProcess" location="../WSDLs/AirthematicBPELProcess.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PARTNERLINKS                                                      
+        List of services participating in this BPEL process               
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    --> 
+    <partnerLinks>
+        <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+        <partnerLink name="airthematicbpelprocess_client" partnerLinkType="client:AirthematicBPELProcess" myRole="AirthematicBPELProcessProvider" partnerRole="AirthematicBPELProcessRequester"/>
+    </partnerLinks>
+    <variables>
+        <variable name="OnMessage_Additionprocess_InputVariable"
+                  messageType="client:AirthematicBPELProcessRequestMessage"/>
+        <variable name="OnMessage_Subtractionprocess_InputVariable"
+                  messageType="client:AirthematicBPELProcessRequestMessage"/>
+        <variable name="AddOutputVariable" messageType="client:AirthematicBPELProcessResponseMessage"/>
+        <variable name="OnMessage_Subtractionprocess_InputVariable_1"
+                  messageType="client:AirthematicBPELProcessRequestMessage"/>
+        <variable name="Subtraction_OutputVariable" messageType="client:AirthematicBPELProcessResponseMessage"/>
+    </variables>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        VARIABLES                                                        
+        List of messages and XML documents used within this BPEL process 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    -->
+
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+       ORCHESTRATION LOGIC                                               
+       Set of activities coordinating the flow of messages across the    
+       services integrated within this business process                  
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    -->
+    <sequence name="main">
+        <!-- Receive input from requestor. (Note: This maps to operation defined in AirthematicBPELProcess.wsdl) -->
+
+        <!-- 
+          Asynchronous callback to the requester. (Note: the callback location and correlation id is transparently handled using WS-addressing.)
+        -->
+        <pick name="Pick1" createInstance="yes">
+            <onMessage bpelx:name="Addition" partnerLink="airthematicbpelprocess_client"
+                       variable="OnMessage_Additionprocess_InputVariable" portType="client:AirthematicBPELProcess"
+                       operation="Additionprocess">
+                <sequence name="Sequence1">
+                    <assign name="Addition_Assign">
+                        <copy>
+                            <from>$OnMessage_Additionprocess_InputVariable.payload/client:InputOne + $OnMessage_Additionprocess_InputVariable.payload/client:InputTwo</from>
+                            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$AddOutputVariable.payload/client:Result</to>
+                        </copy>
+                    </assign>
+                    <invoke name="Addition_Callback" partnerLink="airthematicbpelprocess_client"
+                            portType="client:AirthematicBPELProcessCallback" operation="AdditionprocessResponse"
+                            inputVariable="AddOutputVariable" bpelx:invokeAsDetail="no"/>
+                </sequence>
+            </onMessage>
+            <onMessage bpelx:name="Subtraction" partnerLink="airthematicbpelprocess_client"
+                       variable="OnMessage_Subtractionprocess_InputVariable_1" portType="client:AirthematicBPELProcess"
+                       operation="Subtractionprocess">
+                <sequence name="Sequence2">
+                    <assign name="Assign1">
+                        <copy>
+                            <from>$OnMessage_Subtractionprocess_InputVariable_1.payload/client:InputOne - $OnMessage_Subtractionprocess_InputVariable_1.payload/client:InputTwo</from>
+                            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$Subtraction_OutputVariable.payload/client:Result</to>
+                        </copy>
+                    </assign>
+                    <reply name="SubtractionReply" partnerLink="airthematicbpelprocess_client"
+                           variable="Subtraction_OutputVariable" portType="client:AirthematicBPELProcess"
+                           operation="Subtractionprocess"/>
+                </sequence>
+            </onMessage>
+        </pick>
+    </sequence>
+</process>
